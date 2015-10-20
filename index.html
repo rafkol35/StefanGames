@@ -49,57 +49,33 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             if (mousePressed && !draggedCubic) {
-                //middlecube.rotation.y += (((mouse.x - mouseLast.x) * 180) * Math.PI / 180);
-                //middlecube.rotation.x += (((mouseLast.y - mouse.y) * 180) * Math.PI / 180);
-                
                 var diffangley = (((mouse.x - mouseLast.x) * 90) * Math.PI / 180);
                 var diffanglex = (((mouseLast.y - mouse.y) * 90) * Math.PI / 180);
-                //console.log(" " + diffangley + " " + diffanglex);
                 rotateAroundWorldAxis(pivot, new THREE.Vector3(0, 1, 0), diffangley);
                 rotateAroundWorldAxis(pivot, new THREE.Vector3(1, 0, 0), diffanglex);
-                //console.log(pivot.rotation);
                 pivot.updateMatrix();
                 pivot.updateMatrixWorld();
-                //middlecube.rotateOnAxis(new THREE.Vector3(0, 1, 0), diffangley);
-                //middlecube.rotateOnAxis(new THREE.Vector3(1, 0, 0), diffanglex);
 
-                //middlecube.rotateY(((mouse.x - mouseLast.x) * 180) * Math.PI / 180);
-                //middlecube.rotateX(((mouseLast.y - mouse.y) * 180) * Math.PI / 180);
-
-                //middlecube.localToWorld()
-                //for (var i = 1 ; i < cubics.length ; ++i) {
-                //    //cubics[i].setRotationFromMatrix(middlecube.matrixWorld);
-                //}
                 var i = 0;
                 for (var x = -1 ; x <= 1 ; ++x) {
                     for (var y = -1 ; y <= 1 ; ++y) {
                         for (var z = -1 ; z <= 1 ; ++z) {
-                            //if (x == 0 && y == 0 && z == 0) {
-                            //    i++;
-                            //    continue;
-                            //}
-                            //if (z != 0) continue;
-
                             var cp = pivot.localToWorld(new THREE.Vector3(x, y, z));
-                            //console.log(cp);
                             cubics[i].setRotationFromMatrix(pivot.matrixWorld);
                             cubics[i].position.set(cp.x, cp.y, cp.z);
                             ++i;
                         }
                     }
                 }
-
             }
             else 
             {
-                //middlecube.tr
             }
             mouseLast.set(mouse.x,mouse.y);
         }
 
         function onDocumentMouseDown(event) {
             event.preventDefault();
-            //cube.add(cube2);
             mousePressed = true;
             mouseClickPos.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouseClickPos.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -109,24 +85,13 @@
             var intersects = raycaster.intersectObjects(cubics);
 
             if (intersects.length > 0) {
-                //console.log(intersects.length);
                 draggedCubic = intersects[0].object;
                 console.log(draggedCubic.position);
             }
-
-            //middlecube.rotation.y += ( 5 * Math.PI / 180 );
-
-            //for (var i = 0 ; i < cubics.length ; ++i) {
-            //    middlecube.add(cubics[i]);
-            //}
         }
         function onDocumentMouseUp(event) {
             event.preventDefault();
-            //scene.add(cube2);
             mousePressed = false;
-            //for (var i = 0 ; i < cubics.length ; ++i) {
-            //    scene.add(cubics[i]);
-            //}
             draggedCubic = null;
         }
 
@@ -139,7 +104,6 @@
         var mouse = new THREE.Vector2(), INTERSECTED;
         var mouseClickPos = new THREE.Vector2();
         var mouseLast = new THREE.Vector2();
-        //var radius = 100, theta = 0;
         var raycaster = new THREE.Raycaster();
         var raycasterTouch = new THREE.Raycaster();
 
@@ -166,81 +130,9 @@
         var stats = new Stats();
         container.appendChild(stats.domElement);
 
-        
-
-        //var material2 = new THREE.MeshLambertMaterial({ color: 0xffffff });
-        //var geometry2 = new THREE.BoxGeometry(1, 1, 1);
-        //geometry2.faceVertexUvs[0] = [];
-        //geometry2.faceVertexUvs[0].push([
-          //  new THREE.Vector2(0.5, 1),
-            //new THREE.Vector2(0.5, 1),
-            //new THREE.Vector2(0.5, 1),
-            //new THREE.Vector2(0.5, 1)
-        //]);
-        //geometry.faceVertexUvs[0][0][0] = new THREE.Vector2(0, 0);
-        //geometry.faceVertexUvs[0][0][1] = new THREE.Vector2(0, 2);
-        //geometry.faceVertexUvs[0][0][2] = new THREE.Vector2(2, 0);
-        //console.log(geometry.faceVertexUvs);
-        //console.log(geometry.faceVertexUvs[0]);
-        //console.log(geometry.faceVertexUvs[0][0]);
-        //console.log(geometry.faceVertexUvs[0][0][0]);
-        //var geometry = new THREE.BoxGeometry(1, 1, 1);
-        //geometry.faces[0].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[0].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[0].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[1].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[1].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[1].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[2].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[2].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[2].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[3].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[3].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[3].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[4].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[4].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[4].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[5].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[5].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[5].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[6].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[6].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[6].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[7].vertexColors[0] = new THREE.Color(0xffffff);
-        //geometry.faces[7].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[7].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[8].vertexColors[0] = new THREE.Color(0x00ff00);
-        //geometry.faces[8].vertexColors[1] = new THREE.Color(0x00ff00);
-        //geometry.faces[8].vertexColors[2] = new THREE.Color(0x00ff00);
-        //geometry.faces[9].vertexColors[0] = new THREE.Color(0xff00ff);
-        //geometry.faces[9].vertexColors[1] = new THREE.Color(0xff00ff);
-        //geometry.faces[9].vertexColors[2] = new THREE.Color(0xff00ff);
-        //geometry.faces[10].vertexColors[0] = new THREE.Color(0xff0000);
-        //geometry.faces[10].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[10].vertexColors[2] = new THREE.Color(0xff0000);
-        //geometry.faces[11].vertexColors[0] = new THREE.Color(0xff0000);
-        //geometry.faces[11].vertexColors[1] = new THREE.Color(0xff0000);
-        //geometry.faces[11].vertexColors[2] = new THREE.Color(0xff0000);
-        //var map1 = THREE.ImageUtils.loadTexture('sprite0.png');
-        //var material = new THREE.MeshLambertMaterial({ map: map1, color: 0xffffff, vertexColors: THREE.VertexColors });
-        //var cube = new THREE.Mesh(geometry, material);
-        //scene.add(cube);
-        //var cube2 = new THREE.Mesh(geometry2, material2);
-        //scene.add(cube2);
-        //cube2.position.set(2, 0, 0);
-        //var middlecube = createCubic(new THREE.Vector3(0, 0, 0));
-        //scene.add(middlecube);
-        //var cube2 = createCubic(new THREE.Vector3(2, 0, 0));
-        //scene.add(cube2);
-
         var pivot = new THREE.Object3D();
         var draggedCubic = null;
         var cubics = new Array(27);
-        //cubics[0] = new Array(3);
-        //cubics[1] = new Array(3);
-        //cubics[2] = new Array(3);
-
-        //cubics.push(middlecube);
         var i = 0;
         for (var x = -1 ; x <= 1 ; ++x) {
             for (var y = -1 ; y <= 1 ; ++y) {
@@ -257,61 +149,33 @@
 
                     var cube = createCubic(new THREE.Vector3(x, y, z));
                     scene.add(cube);
-                    //middlecube.add(cube);
-                    //cubics[x][z][y].push(cube);
                     cubics[i] = cube;
                     i++;
                 }
             }
         }
 
-        //console.log(cubics);
-        ///middlecube.localToWorld()
-        //for (var x = -1 ; x <= 1 ; ++x) {
-        //    for (var y = -1 ; y <= 1 ; ++y) {
-        //        for (var z = 0 ; z <= 0 ; ++z) {
-        //            if (x == 0 && y == 0 && z == 0) continue;
-        //            var cube = createCubic(new THREE.Vector3(x, y, z));
-        //            middlecube.add(cube);
-        //            scene.add(cube);
-        //        }
-        //    }
-        //}
-        //cubics.push()
-
         camera.position.set(0, 0, 5);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var render = function () {
-            //theta += 0.1;
-
             if (!mousePressed) {
-                // find intersections
                 raycaster.setFromCamera(mouse, camera);
                 var intersects = raycaster.intersectObjects(cubics);
 
                 if (intersects.length > 0) {
-
-                    //console.log(intersects.length);
-
                     if (INTERSECTED != intersects[0].object) {
                         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
                         INTERSECTED = intersects[0].object;
                         INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
                         INTERSECTED.material.emissive.setHex(0x444444);
-                        //console.log("aaaa " + INTERSECTED);
                     }
-                    //console.log("bbb ");
-
                 } else {
                     if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
                     INTERSECTED = null;
                 }
             }
             requestAnimationFrame(render);
-
-            //cube.rotation.x += 0.01;
-            //cube.rotation.y += 0.01;
 
             renderer.render(scene, camera);
             stats.update();
