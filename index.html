@@ -87,6 +87,11 @@
             if (intersects.length > 0) {
                 draggedCubic = intersects[0].object;
                 console.log(draggedCubic.position);
+
+                var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
+                var cp = pivot.worldToLocal(ccp);
+                cp.round();
+                console.log(cp);
             }
         }
         function onDocumentMouseUp(event) {
@@ -184,8 +189,44 @@
         render();
 
         function createCubic(p) {
-            var map1 = THREE.ImageUtils.loadTexture('sprite0.png');
+            var map1 = THREE.ImageUtils.loadTexture('rbn.png');
             var geometry = new THREE.BoxGeometry(1, 1, 1);
+
+            var cls = [];
+            cls.push(new THREE.Color(0xffffff));
+            cls.push(new THREE.Color(0xff0000));
+            cls.push(new THREE.Color(0x00ff00));
+            cls.push(new THREE.Color(0x0000ff));
+            cls.push(new THREE.Color(0xffff00));
+            cls.push(new THREE.Color(0xdd8800));
+
+            for (var i = 0 ; i < 6 ; ++i) {
+                //for (var f = 0 ; f < 2 ; ++f) {
+                //}
+                geometry.faces[i * 2].vertexColors[0] = cls[i];
+                geometry.faces[i * 2].vertexColors[1] = cls[i];
+                geometry.faces[i * 2].vertexColors[2] = cls[i];
+
+                geometry.faces[i * 2 + 1].vertexColors[0] = cls[i];
+                geometry.faces[i * 2 + 1].vertexColors[1] = cls[i];
+                geometry.faces[i * 2 + 1].vertexColors[2] = cls[i];
+            }
+            //geometry.faces[0].vertexColors[0] = new THREE.Color(0xffffff);
+            //geometry.faces[0].vertexColors[1] = new THREE.Color(0xff0000);
+            //geometry.faces[0].vertexColors[2] = new THREE.Color(0xff0000);
+            //geometry.faces[1].vertexColors[0] = new THREE.Color(0xffffff);
+            //geometry.faces[1].vertexColors[1] = new THREE.Color(0xff0000);
+            //geometry.faces[1].vertexColors[2] = new THREE.Color(0xff0000);
+
+            //for (var i = 0 ; i < 1 ; ++i) {
+                //geometry.faceVertexUvs[0][0][0] = new THREE.Vector2(0, 0);
+                //geometry.faceVertexUvs[0][0][1] = new THREE.Vector2(0, 0.2);
+                //geometry.faceVertexUvs[0][0][2] = new THREE.Vector2(0.2, 0);
+                                       
+                //geometry.faceVertexUvs[0][1][0] = new THREE.Vector2(0, 0);
+                //geometry.faceVertexUvs[0][1][1] = new THREE.Vector2(0, 2);
+                //geometry.faceVertexUvs[0][1][2] = new THREE.Vector2(2, 0);
+            //}
             var material = new THREE.MeshLambertMaterial({ map: map1, color: 0xffffff, vertexColors: THREE.VertexColors });
             var cube = new THREE.Mesh(geometry, material);
             cube.position.set(p.x,p.y,p.z);// = position;
