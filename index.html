@@ -12,6 +12,7 @@
             font-family: georgia;
             text-align: center;
         }
+
         h1 {
         }
 
@@ -19,24 +20,37 @@
             color: skyblue;
         }
 
-        #stats { position: absolute; top: 0; left: 0; }
-        #stats #fps { background: transparent !important; }
-        #stats #fps #fpsText { color: #abc !important; }
-        #stats #fps #fpsGraph { display: none; }
+        #stats {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+            #stats #fps {
+                background: transparent !important;
+            }
+
+                #stats #fps #fpsText {
+                    color: #abc !important;
+                }
+
+                #stats #fps #fpsGraph {
+                    display: none;
+                }
 
         canvas {
             width: 100%;
             height: 100%;
         }
     </style>
-    
+
 </head>
 <body>
     <script src="js/three.min.js"></script>
-    <script src="js/stats.min.js"></script>    
+    <script src="js/stats.min.js"></script>
 
     <script>
-        
+
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -53,23 +67,22 @@
                 var diffanglex = (((mouseLast.y - mouse.y) * 90) * Math.PI / 180);
                 rotateAroundWorldAxis(pivot, new THREE.Vector3(0, 1, 0), diffangley);
                 rotateAroundWorldAxis(pivot, new THREE.Vector3(1, 0, 0), diffanglex);
-                pivot.updateMatrix();
-                pivot.updateMatrixWorld();
+                //pivot.updateMatrix();
+                //pivot.updateMatrixWorld();
 
-                var i = 0;
-                for (var x = -1 ; x <= 1 ; ++x) {
-                    for (var y = -1 ; y <= 1 ; ++y) {
-                        for (var z = -1 ; z <= 1 ; ++z) {
-                            var cp = pivot.localToWorld(new THREE.Vector3(x, y, z));
-                            cubics[i].setRotationFromMatrix(pivot.matrixWorld);
-                            cubics[i].position.set(cp.x, cp.y, cp.z);
-                            ++i;
-                        }
-                    }
-                }
+                //var i = 0;
+                //for (var x = -1 ; x <= 1 ; ++x) {
+                //    for (var y = -1 ; y <= 1 ; ++y) {
+                //        for (var z = -1 ; z <= 1 ; ++z) {
+                //            var cp = pivot.localToWorld(new THREE.Vector3(x, y, z));
+                //            //cubics[i].setRotationFromMatrix(pivot.matrixWorld);
+                //            //cubics[i].position.set(cp.x, cp.y, cp.z);
+                //            ++i;
+                //        }
+                //    }
+                //}
             }
-            else if(mousePressed && draggedCubic)
-            {
+            else if (mousePressed && draggedCubic) {
                 raycasterTouch.setFromCamera(mouse, camera);
                 var intersects = raycasterTouch.intersectObjects(cubics);
 
@@ -82,97 +95,108 @@
                         newTouchedCubic = newTouchedCubic2;
                         if (newTouchedCubic != draggedCubic) {
                             newTouchedCubicFaceNormal = intersects[0].face.normal;
-                            var dcrp = getCubicRoundPosition(draggedCubic);
-                            var crp = getCubicRoundPosition(newTouchedCubic);
+                            //var dcrp = getCubicRoundPosition(draggedCubic);
+                            //var crp = getCubicRoundPosition(newTouchedCubic);
                             //console.log(dcrp);
                             //console.log(crp);
                             //console.log(newTouchedCubicFaceNormal);
-                            //szukam pozostałych 7-miu cubiców...
-
-                            wa = new THREE.Vector3(0, 0, 0);
-                            wai = -2;
-
-                            if (dcrp.x == 0 && crp.x == 0) {
-                                wa.x = 1;
-                                wa.y = 0;
-                                wa.z = 0;
-                                wai = 0;
-                            }
-                            else if (dcrp.y == 0 && crp.y == 0) {
-                                wa.x = 0;
-                                wa.y = 1;
-                                wa.z = 0;
-                                wai = 0;
-                            }
-                            else if (dcrp.z == 0 && crp.z == 0) {
-                                wa.x = 0;
-                                wa.y = 0;
-                                wa.z = 1;
-                                wai = 0;
-                            }
-
-                            if (wai == -2) {
-                                //console.log(dcrp.x + " " + crp.x);
-                                var xe = Math.abs(dcrp.x - crp.x) < 0.1;
-                                var ye = Math.abs(dcrp.y - crp.y) < 0.1;
-                                var ze = Math.abs(dcrp.z - crp.z) < 0.1;
-                                //console.log(xe + " " + ye + " " + ze);
-                                if (xe) {
-
-                                    //console.log(newTouchedCubicFaceNormal);
-
-                                    if (Math.abs(crp.x - newTouchedCubicFaceNormal.x) > 0.1) {
-                                        wa.x = 1;
-                                        wa.y = 0;
-                                        wa.z = 0;
-                                        wai = crp.x;
-                                    }
-                                }
-                                if (ye) {
-                                    if (Math.abs(crp.y - newTouchedCubicFaceNormal.y) > 0.1) {
-                                        wa.x = 0;
-                                        wa.y = 1;
-                                        wa.z = 0;
-                                        wai = crp.y;
-                                    }
-                                }
-                                if (ze) {
-                                    if (Math.abs(crp.z - newTouchedCubicFaceNormal.z) > 0.1) {
-                                        wa.x = 0;
-                                        wa.y = 0;
-                                        wa.z = 1;
-                                        wai = crp.z;
-                                    }
-                                }
-                            }
-                            if (wai == -2) {
-
-                            }
-                            else {
-                                //console.log(wa);
-                                //console.log(wai);
-
-                                rotatingCubes = getCubics(wa, wai);
-                                //console.log(cbs);
-                                if (rotatingCubes.length == 9) {
-                                    //var _crp = getCubicRoundPosition(cbs[4]);
-                                    //console.log(_crp);
-                                    //rotatePivot.position.set(_crp.x, _crp.y, _crp.z);
-
-                                    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
-                                        var piw = rotatingCubes[i].getWorldPosition().clone();
-                                        rotatePivot.add(rotatingCubes[i]);
-                                        
-                                    }
-                                    blockOnRotate = true;
-                                }
-                            }
+                            console.log("szukam pozostałych 7-miu cubiców...");
+                            rotatingCubes = find
                         }
                     }
                 }
+                
             }
-            mouseLast.set(mouse.x,mouse.y);
+            mouseLast.set(mouse.x, mouse.y);
+
+            //                wa = new THREE.Vector3(0, 0, 0);
+            //                wai = -2;
+
+            //                if (dcrp.x == 0 && crp.x == 0) {
+            //                    wa.x = 1;
+            //                    wa.y = 0;
+            //                    wa.z = 0;
+            //                    wai = 0;
+            //                }
+            //                else if (dcrp.y == 0 && crp.y == 0) {
+            //                    wa.x = 0;
+            //                    wa.y = 1;
+            //                    wa.z = 0;
+            //                    wai = 0;
+            //                }
+            //                else if (dcrp.z == 0 && crp.z == 0) {
+            //                    wa.x = 0;
+            //                    wa.y = 0;
+            //                    wa.z = 1;
+            //                    wai = 0;
+            //                }
+
+            //                if (wai == -2) {
+            //                    //console.log(dcrp.x + " " + crp.x);
+            //                    var xe = Math.abs(dcrp.x - crp.x) < 0.1;
+            //                    var ye = Math.abs(dcrp.y - crp.y) < 0.1;
+            //                    var ze = Math.abs(dcrp.z - crp.z) < 0.1;
+            //                    //console.log(xe + " " + ye + " " + ze);
+            //                    if (xe) {
+
+            //                        //console.log(newTouchedCubicFaceNormal);
+
+            //                        if (Math.abs(crp.x - newTouchedCubicFaceNormal.x) > 0.1) {
+            //                            wa.x = 1;
+            //                            wa.y = 0;
+            //                            wa.z = 0;
+            //                            wai = crp.x;
+            //                        }
+            //                    }
+            //                    if (ye) {
+            //                        if (Math.abs(crp.y - newTouchedCubicFaceNormal.y) > 0.1) {
+            //                            wa.x = 0;
+            //                            wa.y = 1;
+            //                            wa.z = 0;
+            //                            wai = crp.y;
+            //                        }
+            //                    }
+            //                    if (ze) {
+            //                        if (Math.abs(crp.z - newTouchedCubicFaceNormal.z) > 0.1) {
+            //                            wa.x = 0;
+            //                            wa.y = 0;
+            //                            wa.z = 1;
+            //                            wai = crp.z;
+            //                        }
+            //                    }
+            //                }
+            //                if (wai == -2) {
+
+            //                }
+            //                else {
+            //                    //console.log(wa);
+            //                    //console.log(wai);
+
+            //                    rotatingCubes = getCubics(wa, wai);
+            //                    //console.log(cbs);
+            //                    if (rotatingCubes.length == 9) {
+            //                        //var _crp = getCubicRoundPosition(cbs[4]);
+            //                        //console.log(_crp);
+            //                        //rotatePivot.position.set(_crp.x, _crp.y, _crp.z);
+
+            //                        //for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+            //                        //    //var piw = rotatingCubes[i].getWorldPosition().clone();
+            //                        //    //rotatePivot.add(rotatingCubes[i]);
+            //                        //}
+
+            //                        setCubesEmissive(rotatingCubes, 0x888888);
+
+            //                        blockOnRotate = true;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //mouseLast.set(mouse.x, mouse.y);
         }
+
+        var mousePressedPos = new THREE.Vector2(0, 0);
 
         function onDocumentMouseDown(event) {
             event.preventDefault();
@@ -181,30 +205,67 @@
             mouseClickPos.y = -(event.clientY / window.innerHeight) * 2 + 1;
             mouseLast = mouseClickPos;
 
-            raycasterTouch.setFromCamera(mouse, camera);
-            var intersects = raycasterTouch.intersectObjects(cubics);
+            mousePressedPos.x = mouseClickPos.x;
+            mousePressedPos.y = mouseClickPos.y;
 
-            if (intersects.length > 0) {
-                draggedCubic = intersects[0].object;
-                draggedCubicFaceNormal = intersects[0].face.normal;
+            if (blockOnRotate) {
 
-                //console.log(draggedCubic.position);
+            } else {
+                raycasterTouch.setFromCamera(mouse, camera);
+                var intersects = raycasterTouch.intersectObjects(cubics);
 
-                //var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
-                //var cp = pivot.worldToLocal(ccp);
-                //cp.round();
-                ////console.log(cp);
+                if (intersects.length > 0) {
+                    draggedCubic = intersects[0].object;
+                    draggedCubicFaceNormal = intersects[0].face.normal;
 
-                var crp = getCubicRoundPosition(draggedCubic);
-                //console.log(crp);
-                //console.log(draggedCubicFaceNormal);
-                //console.log("========================");
+                    //console.log(draggedCubic.position);
+                    //testRotatedCube = draggedCubic;
+
+                    //console.log(pivot.matrix);
+
+                    //x0 = testRotatedCube.position.x;
+                    //y0 = testRotatedCube.position.y;
+                    //r = new THREE.Vector2(testRotatedCube.position.x, testRotatedCube.position.y, 0).length();
+                    //var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
+                    //var cp = pivot.worldToLocal(ccp);
+                    //cp.round();
+                    ////console.log(cp);
+
+                    var crp = getCubicRoundPosition(draggedCubic);
+                    //console.log(crp);
+                    //console.log(draggedCubicFaceNormal);
+                    //console.log("========================");
+                }
+
+                //} else {
+                //    if (blockOnRotate) {
+                //        setCubesEmissive(rotatingCubes, 0x000000);
+                //        //rotatingCubes.cle
+                //        blockOnRotate = false;
+                //    }
+                //}
             }
         }
         function onDocumentMouseUp(event) {
             event.preventDefault();
             mousePressed = false;
             draggedCubic = null;
+
+            var mouseClickPos2 = new THREE.Vector2(0,0);
+            mouseClickPos2.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseClickPos2.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            //var dist = mouseClickPos2.sub(mouseClickPos);
+            //console.log(" " + mousePressedPos.x + "  " + mousePressedPos.y);// + " " + dist.length());
+            //console.log(" " + mouseClickPos2.x + "  " + mouseClickPos2.y);// + " " + dist.length());
+            var dist = mousePressedPos.distanceTo(mouseClickPos2);
+            //console.log(dist);
+            if (blockOnRotate) {    
+                if (dist < 0.01){
+                    setCubesEmissive(rotatingCubes, 0x000000);
+                    //rotatingCubes.cle
+                    blockOnRotate = false;
+                }
+            }
         }
 
         document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -245,13 +306,12 @@
         var pivot = new THREE.Object3D();
         scene.add(pivot);
         //pivot.position.x = -5;
-        var rotatePivot = new THREE.Object3D();
-        pivot.add(rotatePivot);
-        //pivot.getWorldPosition();
+        //var rotatePivot = new THREE.Object3D();
+        //pivot.add(rotatePivot);
 
         var blockOnRotate = false;
-        var wa = new THREE.Vector3(0, 0, 0);
-        var wai = -2;
+        //var wa = new THREE.Vector3(-1, 0, 0);
+        //var wai = -2;
         var rotatingCubes;
 
         var draggedCubic = null;
@@ -259,6 +319,13 @@
         var newTouchedCubic = null;
         var newTouchedCubicFaceNormal = null;
         var cubics = new Array(27);
+
+        var testRotatedCube = null;
+        var th = 0.0;
+        var r = 1.0;
+        var x0 = 0.0;
+        var y0 = 0.0;
+
         var i = 0;
         for (var x = -1 ; x <= 1 ; ++x) {
             for (var y = -1 ; y <= 1 ; ++y) {
@@ -273,78 +340,129 @@
                     //    continue;
                     //}
 
+                    if (x == 0) {
+                        //    i++;
+                        //  continue;
+                    }
+
                     var cube = createCubic(new THREE.Vector3(x, y, z));
                     cube.name = "" + x + "_" + y + "_" + z;
-                    scene.add(cube);
+                    //if (x == 0 || y == 0 || z == 0) {
+                    //}
+                    //else {
+                    pivot.add(cube);
+                    //}
                     cubics[i] = cube;
                     i++;
                 }
             }
         }
 
-        //var tcAxis = new THREE.Vector3(0,1,0);
-        //var testCube = createCubic(new THREE.Vector3(0, 0, 0));
-        //scene.add(testCube);
-        //testCube.rotation.x 
-        //testCube.rotateX(45 * Math.PI / 180);
-        //testCube
-
-        //testCube.updateMatrix();
-        //testCube.updateMatrixWorld();
-        //console.log(tcAxis);        
-        //tcAxis.applyMatrix4(testCube.matrixWorld);
-        ////testCube.matrixWorld.multiplyVector3(tcAxis);
-        //console.log(tcAxis);
-        //tcAxis.normalize();
-        //console.log(tcAxis);
-
         camera.position.set(0, 0, 5);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var render = function () {
-            if (!mousePressed) {
-                raycaster.setFromCamera(mouse, camera);
-                var intersects = raycaster.intersectObjects(cubics);
+            if (blockOnRotate) {
 
-                if (intersects.length > 0) {
-                    if (INTERSECTED != intersects[0].object) {
+                //for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+                //    rotatingCubes[i].material.emissive.setHex(0x888888);
+                //}
+            }
+            else {
+                if (!mousePressed) {
+                    raycaster.setFromCamera(mouse, camera);
+                    var intersects = raycaster.intersectObjects(cubics);
+
+                    if (intersects.length > 0) {
+                        if (INTERSECTED != intersects[0].object) {
+                            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+                            INTERSECTED = intersects[0].object;
+                            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+                            INTERSECTED.material.emissive.setHex(0xbbbbbb);
+                        }
+                    } else {
                         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                        INTERSECTED = intersects[0].object;
-                        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                        INTERSECTED.material.emissive.setHex(0x444444);
+                        INTERSECTED = null;
                     }
-                } else {
-                    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                    INTERSECTED = null;
                 }
             }
+
+            //else {
+            //    if (blockOnRotate) {
+            //        console.log(rotatingCubes.length);
+            //        for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+            //            rotatingCubes[i].material.emissive.setHex(0x888888);
+            //        }
+            //    }
+            //}
+
             requestAnimationFrame(render);
 
             //testCube.rotation.x += 0.01;
             //testCube.rotateOnAxis(tcAxis,0.01);
 
-            if (blockOnRotate) {
-                //console.log(wa);
-                rotatePivot.rotateOnAxis(wa, 0.025);
-                //console.log(rotatingCubes);
-                for (var i = 0 ; i < rotatingCubes.length ; ++i) {
-                    //var c = rotatingCubes[i];
-                    //var lp = c.userData.clone();
-                    //console.log(lp);
-                    //rotatePivot.localToWorld(lp);
-                    //console.log(lp);
-                    //c.position.set(lp.x, lp.y, lp.z);
-                    //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
-                }
+            //if (blockOnRotate) {
+            //    //console.log(wa);
+            //    rotatePivot.rotateOnAxis(wa, 0.025);
+            //    //console.log(rotatingCubes);
+            //    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+            //        //var c = rotatingCubes[i];
+            //        //var lp = c.userData.clone();
+            //        //console.log(lp);
+            //        //rotatePivot.localToWorld(lp);
+            //        //console.log(lp);
+            //        //c.position.set(lp.x, lp.y, lp.z);
+            //        //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
+            //    }
 
-                //blockOnRotate = false;
-            }
+            //    //blockOnRotate = false;
+            //}
+
+            //if (testRotatedCube)
+            //{
+            //    var delta = clock.getDelta();
+            //    //console.log(delta);
+
+            //    var nx = Math.cos(th) * r + x0;
+            //    var ny = Math.sin(th) * r + y0;
+            //    testRotatedCube.position.x = nx;
+            //    testRotatedCube.position.y = ny;
+            //    ////testRotatedCube.rotation.set(testRotatedCube.rotation.x+=0.1,testRotatedCube.rotation.y,testRotatedCube.rotation.z);
+
+            //    for (var i = 0 ; i < cubics.length ; ++i) {
+            //        var c = cubics[i];
+            //        //var lp = c.userData.clone();
+            //        //console.log(lp);
+            //        //rotatePivot.localToWorld(lp);
+            //        //console.log(lp);
+            //        //c.position.set(lp.x, lp.y, lp.z);
+            //        //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
+            //    }
+
+
+            //    ////testRotatedCube.rotateOnAxis(wa,0.1);
+            //    //var nry = testRotatedCube.rotation.y;
+            //    var dNnr = delta * Math.PI * 2;
+            //    //nry += dNnr;
+            //    //testRotatedCube.rotation.set(testRotatedCube.rotation.x, nry, testRotatedCube.rotation.z);
+            //    ////testRotatedCube.translateX(0.1);
+            //    ////rotateAroundWorldAxis(testRotatedCube, wa, 0.1);
+
+            //    th += dNnr;
+            //}
 
             renderer.render(scene, camera);
             stats.update();
         };
 
         render();
+
+        function setCubesEmissive(_cubics, emissiveVal) {
+            //console.log(_cubics.length);
+            for (var i = 0 ; i < _cubics.length ; ++i) {
+                _cubics[i].material.emissive.setHex(emissiveVal);
+            }
+        }
 
         function createCubic(p) {
             var map1 = THREE.ImageUtils.loadTexture('rbn.png');
@@ -370,7 +488,7 @@
                 geometry.faces[i * 2 + 1].vertexColors[2] = cls[i];
             }
             geometry.normalsNeedUpdate = true;
-           
+
             var material = new THREE.MeshLambertMaterial({ map: map1, color: 0xffffff, vertexColors: THREE.VertexColors });
             var cube = new THREE.Mesh(geometry, material);
             cube.position.set(p.x, p.y, p.z);// = position;
@@ -378,7 +496,7 @@
             return cube;
         };
 
-        // Rotate an object around an arbitrary axis in world space       
+        // Rotate an object around an arbitrary axis in world space
         function rotateAroundWorldAxis(object, axis, radians) {
             var rotationMatrix = new THREE.Matrix4();
             rotationMatrix.makeRotationAxis(axis.normalize(), radians);
@@ -387,7 +505,7 @@
             object.rotation.setFromRotationMatrix(object.matrix);
         }
 
-        function getCubicRoundPosition(cubic){
+        function getCubicRoundPosition(cubic) {
             //var ccp = new THREE.Vector3(cubic.position.x, newTouchedCubic.position.y, newTouchedCubic.position.z);
             var ccp = cubic.position.clone();
             var cp = pivot.worldToLocal(ccp);
@@ -400,7 +518,7 @@
             for (var i = 0 ; i < cubics.length ; ++i) {
                 var cubic = cubics[i];
                 var crp = getCubicRoundPosition(cubic);
-                
+
                 if (locPos.equals(crp)) {
                     //console.log(crp);
                     return cubic;
@@ -411,6 +529,32 @@
 
         function getCubics(whichAxes, whichAxesIndex) {
             var retCubs = [];
+            if (whichAxes.x == 1) {
+                var locPos = new THREE.Vector3(whichAxesIndex, 0, 0);
+                for (var y = -1 ; y <= 1 ; y++) {
+                    locPos.y = y;
+                    for (var z = -1 ; z <= 1 ; z++) {
+                        locPos.z = z;
+                        var c = getCube(locPos);
+                        //console.log(locPos);
+                        //console.log(c);
+                        if (c) {
+                            c.userData = locPos.clone();
+                            //console.log(c.userData);
+                            retCubs.push(c);
+                        }
+                    }
+                }
+            }
+            //console.log("--------------------------------------------------------");
+            return retCubs;
+        }
+
+        function getCubicsBy(_cube1, _cube2) {
+            var retCubs = [];
+            var commonPosElement = -1;
+            _cube1.position.x
+
             if (whichAxes.x == 1) {
                 var locPos = new THREE.Vector3(whichAxesIndex, 0, 0);
                 for (var y = -1 ; y <= 1 ; y++) {
