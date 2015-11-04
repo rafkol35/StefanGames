@@ -100,8 +100,12 @@
                             //console.log(dcrp);
                             //console.log(crp);
                             //console.log(newTouchedCubicFaceNormal);
-                            console.log("szukam pozostałych 7-miu cubiców...");
-                            rotatingCubes = find
+                            //console.log("szukam pozostałych 7-miu cubiców...");
+                            rotatingCubes = getCubicsBy(draggedCubic, newTouchedCubic);
+                            //console.log(rotatingCubes.length);
+                            setCubesEmissive(rotatingCubes, 0x888888);
+                            blockOnRotate = true;
+                            mousePressed = false;
                         }
                     }
                 }
@@ -550,29 +554,49 @@
             return retCubs;
         }
 
+        function getCubics2(commonPosElement, commonPosElementVal) {
+            var retCubs = [];
+            if( commonPosElement < 0 ) return retCubs;
+            for (var i = 0 ; i < cubics.length ; ++i) {
+                switch(commonPosElement)
+                {
+                    case 0: //x
+                        if (cubics[i].position.x == commonPosElementVal)
+                            retCubs.push(cubics[i]);
+                        break;
+                    case 1: //y
+                        if (cubics[i].position.y == commonPosElementVal)
+                            retCubs.push(cubics[i]);
+                        break;
+                    case 2: //z
+                        if (cubics[i].position.z == commonPosElementVal)
+                            retCubs.push(cubics[i]);
+                        break;
+                }
+            }
+            return retCubs;
+        }
+
         function getCubicsBy(_cube1, _cube2) {
             var retCubs = [];
             var commonPosElement = -1;
-            _cube1.position.x
-
-            if (whichAxes.x == 1) {
-                var locPos = new THREE.Vector3(whichAxesIndex, 0, 0);
-                for (var y = -1 ; y <= 1 ; y++) {
-                    locPos.y = y;
-                    for (var z = -1 ; z <= 1 ; z++) {
-                        locPos.z = z;
-                        var c = getCube(locPos);
-                        //console.log(locPos);
-                        //console.log(c);
-                        if (c) {
-                            c.userData = locPos.clone();
-                            //console.log(c.userData);
-                            retCubs.push(c);
-                        }
-                    }
-                }
+            var commonPosElementVal = 0;
+            if (_cube1.position.x == _cube2.position.x) {
+                commonPosElement = 0;
+                commonPosElementVal = _cube1.position.x;
             }
-            //console.log("--------------------------------------------------------");
+            else if (_cube1.position.y == _cube2.position.y) {
+                commonPosElement = 1;
+                commonPosElementVal = _cube1.position.y;
+            }
+            else if (_cube1.position.y == _cube2.position.y) {
+                commonPosElement = 2;
+                commonPosElementVal = _cube1.position.z;
+            }
+
+            if (commonPosElement < 0) return retCubs;
+
+            retCubs = getCubics2(commonPosElement, commonPosElementVal);
             return retCubs;
         }
 
