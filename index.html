@@ -103,9 +103,11 @@
                             //console.log("szukam pozostałych 7-miu cubiców...");
                             rotatingCubes = getCubicsBy(draggedCubic, newTouchedCubic);
                             //console.log(rotatingCubes.length);
-                            setCubesEmissive(rotatingCubes, 0x888888);
-                            blockOnRotate = true;
-                            mousePressed = false;
+                            if (rotatingCubes.length == 9) {
+                                setCubesEmissive(rotatingCubes, 0x888888);
+                                blockOnRotate = true;
+                                mousePressed = false;
+                            }
                         }
                     }
                 }
@@ -555,6 +557,7 @@
         }
 
         function getCubics2(commonPosElement, commonPosElementVal) {
+            console.log("getCubics : " + commonPosElement + " => " + commonPosElementVal);
             var retCubs = [];
             if( commonPosElement < 0 ) return retCubs;
             for (var i = 0 ; i < cubics.length ; ++i) {
@@ -579,19 +582,64 @@
 
         function getCubicsBy(_cube1, _cube2) {
             var retCubs = [];
+            console.log(draggedCubicFaceNormal);
+            console.log(newTouchedCubicFaceNormal);
+            if (!draggedCubicFaceNormal.equals(newTouchedCubicFaceNormal)) {
+            //    console.warn("normalki sie nie zgadaja... - jeszcze poki co nie obsluguje tego przypadku");
+            //    return retCubs;
+            }
             var commonPosElement = -1;
             var commonPosElementVal = 0;
-            if (_cube1.position.x == _cube2.position.x) {
-                commonPosElement = 0;
-                commonPosElementVal = _cube1.position.x;
+            if (_cube1.position.x != _cube2.position.x) {
+                if (newTouchedCubicFaceNormal.z != 0) {
+                    if (_cube1.position.y == _cube2.position.y) {
+                        commonPosElement = 1;
+                        commonPosElementVal = _cube1.position.y;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                } else {
+                    if (_cube1.position.z == _cube2.position.z) {
+                        commonPosElement = 2;
+                        commonPosElementVal = _cube1.position.z;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                }                
             }
-            else if (_cube1.position.y == _cube2.position.y) {
-                commonPosElement = 1;
-                commonPosElementVal = _cube1.position.y;
+            else if (_cube1.position.y != _cube2.position.y) {
+                if (newTouchedCubicFaceNormal.x != 0) {
+                    if (_cube1.position.z == _cube2.position.z) {
+                        commonPosElement = 2;
+                        commonPosElementVal = _cube1.position.z;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                } else {
+                    if (_cube1.position.x == _cube2.position.x) {
+                        commonPosElement = 0;
+                        commonPosElementVal = _cube1.position.x;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                }
             }
-            else if (_cube1.position.y == _cube2.position.y) {
-                commonPosElement = 2;
-                commonPosElementVal = _cube1.position.z;
+            else if (_cube1.position.z != _cube2.position.z) {
+                if (newTouchedCubicFaceNormal.y != 0) {
+                    if (_cube1.position.x == _cube2.position.x) {
+                        commonPosElement = 0;
+                        commonPosElementVal = _cube1.position.x;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                } else {
+                    if (_cube1.position.y == _cube2.position.y) {
+                        commonPosElement = 1;
+                        commonPosElementVal = _cube1.position.y;
+                    } else {
+                        console.warn("getCubicsBy");
+                    }
+                }
             }
 
             if (commonPosElement < 0) return retCubs;
