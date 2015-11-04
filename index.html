@@ -68,8 +68,108 @@
                     }
                 }
             }
-            else 
+            else if(mousePressed && draggedCubic)
             {
+                raycasterTouch.setFromCamera(mouse, camera);
+                var intersects = raycasterTouch.intersectObjects(cubics);
+
+                if (intersects.length > 0) {
+                    //console.log(intersects.length);
+                    //intersects[0].face.normal
+                    var newTouchedCubic2 = intersects[0].object;
+
+                    if (newTouchedCubic != newTouchedCubic2) {
+                        newTouchedCubic = newTouchedCubic2;
+                        if (newTouchedCubic != draggedCubic) {
+                            newTouchedCubicFaceNormal = intersects[0].face.normal;
+                            var dcrp = getCubicRoundPosition(draggedCubic);
+                            var crp = getCubicRoundPosition(newTouchedCubic);
+                            //console.log(dcrp);
+                            //console.log(crp);
+                            //console.log(newTouchedCubicFaceNormal);
+                            //szukam pozostałych 7-miu cubiców...
+
+                            wa = new THREE.Vector3(0, 0, 0);
+                            wai = -2;
+
+                            if (dcrp.x == 0 && crp.x == 0) {
+                                wa.x = 1;
+                                wa.y = 0;
+                                wa.z = 0;
+                                wai = 0;
+                            }
+                            else if (dcrp.y == 0 && crp.y == 0) {
+                                wa.x = 0;
+                                wa.y = 1;
+                                wa.z = 0;
+                                wai = 0;
+                            }
+                            else if (dcrp.z == 0 && crp.z == 0) {
+                                wa.x = 0;
+                                wa.y = 0;
+                                wa.z = 1;
+                                wai = 0;
+                            }
+
+                            if (wai == -2) {
+                                //console.log(dcrp.x + " " + crp.x);
+                                var xe = Math.abs(dcrp.x - crp.x) < 0.1;
+                                var ye = Math.abs(dcrp.y - crp.y) < 0.1;
+                                var ze = Math.abs(dcrp.z - crp.z) < 0.1;
+                                //console.log(xe + " " + ye + " " + ze);
+                                if (xe) {
+
+                                    //console.log(newTouchedCubicFaceNormal);
+
+                                    if (Math.abs(crp.x - newTouchedCubicFaceNormal.x) > 0.1) {
+                                        wa.x = 1;
+                                        wa.y = 0;
+                                        wa.z = 0;
+                                        wai = crp.x;
+                                    }
+                                }
+                                if (ye) {
+                                    if (Math.abs(crp.y - newTouchedCubicFaceNormal.y) > 0.1) {
+                                        wa.x = 0;
+                                        wa.y = 1;
+                                        wa.z = 0;
+                                        wai = crp.y;
+                                    }
+                                }
+                                if (ze) {
+                                    if (Math.abs(crp.z - newTouchedCubicFaceNormal.z) > 0.1) {
+                                        wa.x = 0;
+                                        wa.y = 0;
+                                        wa.z = 1;
+                                        wai = crp.z;
+                                    }
+                                }
+                            }
+                            if (wai == -2) {
+
+                            }
+                            else {
+                                //console.log(wa);
+                                //console.log(wai);
+
+                                rotatingCubes = getCubics(wa, wai);
+                                //console.log(cbs);
+                                if (rotatingCubes.length == 9) {
+                                    //var _crp = getCubicRoundPosition(cbs[4]);
+                                    //console.log(_crp);
+                                    //rotatePivot.position.set(_crp.x, _crp.y, _crp.z);
+
+                                    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+                                        var piw = rotatingCubes[i].getWorldPosition().clone();
+                                        rotatePivot.add(rotatingCubes[i]);
+                                        
+                                    }
+                                    blockOnRotate = true;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             mouseLast.set(mouse.x,mouse.y);
         }
@@ -82,16 +182,23 @@
             mouseLast = mouseClickPos;
 
             raycasterTouch.setFromCamera(mouse, camera);
-            var intersects = raycaster.intersectObjects(cubics);
+            var intersects = raycasterTouch.intersectObjects(cubics);
 
             if (intersects.length > 0) {
                 draggedCubic = intersects[0].object;
-                console.log(draggedCubic.position);
+                draggedCubicFaceNormal = intersects[0].face.normal;
 
-                var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
-                var cp = pivot.worldToLocal(ccp);
-                cp.round();
-                console.log(cp);
+                //console.log(draggedCubic.position);
+
+                //var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
+                //var cp = pivot.worldToLocal(ccp);
+                //cp.round();
+                ////console.log(cp);
+
+                var crp = getCubicRoundPosition(draggedCubic);
+                //console.log(crp);
+                //console.log(draggedCubicFaceNormal);
+                //console.log("========================");
             }
         }
         function onDocumentMouseUp(event) {
@@ -136,7 +243,21 @@
         container.appendChild(stats.domElement);
 
         var pivot = new THREE.Object3D();
+        scene.add(pivot);
+        //pivot.position.x = -5;
+        var rotatePivot = new THREE.Object3D();
+        pivot.add(rotatePivot);
+        //pivot.getWorldPosition();
+
+        var blockOnRotate = false;
+        var wa = new THREE.Vector3(0, 0, 0);
+        var wai = -2;
+        var rotatingCubes;
+
         var draggedCubic = null;
+        var draggedCubicFaceNormal = null;
+        var newTouchedCubic = null;
+        var newTouchedCubicFaceNormal = null;
         var cubics = new Array(27);
         var i = 0;
         for (var x = -1 ; x <= 1 ; ++x) {
@@ -153,12 +274,29 @@
                     //}
 
                     var cube = createCubic(new THREE.Vector3(x, y, z));
+                    cube.name = "" + x + "_" + y + "_" + z;
                     scene.add(cube);
                     cubics[i] = cube;
                     i++;
                 }
             }
         }
+
+        //var tcAxis = new THREE.Vector3(0,1,0);
+        //var testCube = createCubic(new THREE.Vector3(0, 0, 0));
+        //scene.add(testCube);
+        //testCube.rotation.x 
+        //testCube.rotateX(45 * Math.PI / 180);
+        //testCube
+
+        //testCube.updateMatrix();
+        //testCube.updateMatrixWorld();
+        //console.log(tcAxis);        
+        //tcAxis.applyMatrix4(testCube.matrixWorld);
+        ////testCube.matrixWorld.multiplyVector3(tcAxis);
+        //console.log(tcAxis);
+        //tcAxis.normalize();
+        //console.log(tcAxis);
 
         camera.position.set(0, 0, 5);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -181,6 +319,26 @@
                 }
             }
             requestAnimationFrame(render);
+
+            //testCube.rotation.x += 0.01;
+            //testCube.rotateOnAxis(tcAxis,0.01);
+
+            if (blockOnRotate) {
+                //console.log(wa);
+                rotatePivot.rotateOnAxis(wa, 0.025);
+                //console.log(rotatingCubes);
+                for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+                    //var c = rotatingCubes[i];
+                    //var lp = c.userData.clone();
+                    //console.log(lp);
+                    //rotatePivot.localToWorld(lp);
+                    //console.log(lp);
+                    //c.position.set(lp.x, lp.y, lp.z);
+                    //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
+                }
+
+                //blockOnRotate = false;
+            }
 
             renderer.render(scene, camera);
             stats.update();
@@ -211,25 +369,12 @@
                 geometry.faces[i * 2 + 1].vertexColors[1] = cls[i];
                 geometry.faces[i * 2 + 1].vertexColors[2] = cls[i];
             }
-            //geometry.faces[0].vertexColors[0] = new THREE.Color(0xffffff);
-            //geometry.faces[0].vertexColors[1] = new THREE.Color(0xff0000);
-            //geometry.faces[0].vertexColors[2] = new THREE.Color(0xff0000);
-            //geometry.faces[1].vertexColors[0] = new THREE.Color(0xffffff);
-            //geometry.faces[1].vertexColors[1] = new THREE.Color(0xff0000);
-            //geometry.faces[1].vertexColors[2] = new THREE.Color(0xff0000);
-
-            //for (var i = 0 ; i < 1 ; ++i) {
-                //geometry.faceVertexUvs[0][0][0] = new THREE.Vector2(0, 0);
-                //geometry.faceVertexUvs[0][0][1] = new THREE.Vector2(0, 0.2);
-                //geometry.faceVertexUvs[0][0][2] = new THREE.Vector2(0.2, 0);
-                                       
-                //geometry.faceVertexUvs[0][1][0] = new THREE.Vector2(0, 0);
-                //geometry.faceVertexUvs[0][1][1] = new THREE.Vector2(0, 2);
-                //geometry.faceVertexUvs[0][1][2] = new THREE.Vector2(2, 0);
-            //}
+            geometry.normalsNeedUpdate = true;
+           
             var material = new THREE.MeshLambertMaterial({ map: map1, color: 0xffffff, vertexColors: THREE.VertexColors });
             var cube = new THREE.Mesh(geometry, material);
-            cube.position.set(p.x,p.y,p.z);// = position;
+            cube.position.set(p.x, p.y, p.z);// = position;
+            //console.log(geometry);
             return cube;
         };
 
@@ -240,6 +385,51 @@
             rotationMatrix.multiply(object.matrix);                       // pre-multiply
             object.matrix = rotationMatrix;
             object.rotation.setFromRotationMatrix(object.matrix);
+        }
+
+        function getCubicRoundPosition(cubic){
+            //var ccp = new THREE.Vector3(cubic.position.x, newTouchedCubic.position.y, newTouchedCubic.position.z);
+            var ccp = cubic.position.clone();
+            var cp = pivot.worldToLocal(ccp);
+            cp.round();
+            //console.log(cp);
+            return cp;
+        }
+
+        function getCube(locPos) {
+            for (var i = 0 ; i < cubics.length ; ++i) {
+                var cubic = cubics[i];
+                var crp = getCubicRoundPosition(cubic);
+                
+                if (locPos.equals(crp)) {
+                    //console.log(crp);
+                    return cubic;
+                }
+            }
+            return null;
+        }
+
+        function getCubics(whichAxes, whichAxesIndex) {
+            var retCubs = [];
+            if (whichAxes.x == 1) {
+                var locPos = new THREE.Vector3(whichAxesIndex, 0, 0);
+                for (var y = -1 ; y <= 1 ; y++) {
+                    locPos.y = y;
+                    for (var z = -1 ; z <= 1 ; z++) {
+                        locPos.z = z;
+                        var c = getCube(locPos);
+                        //console.log(locPos);
+                        //console.log(c);
+                        if (c) {
+                            c.userData = locPos.clone();
+                            //console.log(c.userData);
+                            retCubs.push(c);
+                        }
+                    }
+                }
+            }
+            //console.log("--------------------------------------------------------");
+            return retCubs;
         }
 
     </script>
