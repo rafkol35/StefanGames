@@ -504,7 +504,7 @@
                         //console.log(_t);
                         RCRotAxises.push(_t);
 
-                        RCBeginAngles2.push(rotatingCubes[i].rotation);
+                        RCBeginAngles2.push(rotatingCubes[i].rotation.clone());
 
                         continue;
                     }
@@ -524,7 +524,7 @@
                         //console.log(_t);
                         RCRotAxises.push(_t);
 
-                        RCBeginAngles2.push(rotatingCubes[i].rotation);
+                        RCBeginAngles2.push(rotatingCubes[i].rotation.clone());
 
                         continue;
                     }
@@ -543,10 +543,10 @@
             }
             //RCDuration = Math.min(RCDuration, RCRotTime);
             
-            RCStep = (RCDuration / RCRotTime) * (Math.PI / 2);
-            //RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime)) * (Math.PI / 2);
+            //RCStep = (RCDuration / RCRotTime) * (Math.PI / 2);
+            RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime)) * (Math.PI / 2);
             //dt *= EasingFunctions.easeInOutCubic(RCDuration / RCRotTime) / (RCDuration / RCRotTime);
-            var RCStep2 = (dt / RCRotTime) * (Math.PI / 2);
+            //var RCStep2 = (dt / RCRotTime) * (Math.PI / 2);
 
             
             //var RCStep2 = _RCStep2
@@ -562,21 +562,8 @@
                         var nz = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
-                        //rotatingCubes[i].updateMatrix();
-                        //rotatingCubes[i].updateMatrixWorld();
-
-                        //console.log("==========================================")
-                        //console.log(rotatingCubes[i].rotation);
                         rotatingCubes[i].rotation.copy(RCBeginAngles2[i]);
-                        //rotatingCubes[i].rotation = RCBeginAngles2[i].clone();
-                        //rotatingCubes[i].quaternion = RCBeginAngles2[i].clone();
-                        //console.log(rotatingCubes[i].rotation);
-                        //rotatingCubes[i].updateMatrix();
-                        //rotatingCubes[i].updateMatrixWorld();
-                        //console.log(rotatingCubes[i].rotation);
                         rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep);
-                        //console.log(rotatingCubes[i].rotation);
-                        //console.log("==========================================")
                     }
                     break;
                 case 1:
@@ -587,10 +574,8 @@
                         var nx = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(nx, rotatingCubes[i].position.y, nz);
-                        rotatingCubes[i].updateMatrix();
-                        rotatingCubes[i].updateMatrixWorld();
-
-                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
+                        rotatingCubes[i].rotation.copy(RCBeginAngles2[i]);
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep);
                     }
                     break;
                 case 2:
@@ -601,10 +586,8 @@
                         var ny = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(nx, ny, rotatingCubes[i].position.z);
-                        rotatingCubes[i].updateMatrix();
-                        rotatingCubes[i].updateMatrixWorld();
-
-                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
+                        rotatingCubes[i].rotation.copy(RCBeginAngles2[i]);
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep);
                     }
                     break;
             }
@@ -615,8 +598,8 @@
                     //console.log(rotatingCubes[i].position);
                     rotatingCubes[i].position.round();
                     //console.log(rotatingCubes[i].position);
-                    rotatingCubes[i].updateMatrix();
-                    rotatingCubes[i].updateMatrixWorld();
+                    //rotatingCubes[i].updateMatrix();
+                    //rotatingCubes[i].updateMatrixWorld();
                 }
                 //console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
                 RCBlock = false;
