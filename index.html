@@ -464,6 +464,7 @@
             RCBeginAngles = [];
             RCRs = [];
             RCRotAxises = [];
+            RCBeginAngles2 = [];
 
             var rotationCenterPos = new THREE.Vector3(0, 0, 0);
             switch (cubRotInfo.x) {
@@ -483,7 +484,7 @@
                         //console.log(_t);
                         RCRotAxises.push(_t);
 
-                        //RCBeginAngles2.push(rotatingCubes[i].rotation.x);
+                        RCBeginAngles2.push(rotatingCubes[i].rotation.clone());
 
                         continue;
                     }
@@ -503,6 +504,8 @@
                         //console.log(_t);
                         RCRotAxises.push(_t);
 
+                        RCBeginAngles2.push(rotatingCubes[i].rotation);
+
                         continue;
                     }
                     break;
@@ -520,6 +523,8 @@
                         rotatingCubes[i].worldToLocal(_t);
                         //console.log(_t);
                         RCRotAxises.push(_t);
+
+                        RCBeginAngles2.push(rotatingCubes[i].rotation);
 
                         continue;
                     }
@@ -557,11 +562,21 @@
                         var nz = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
-                        rotatingCubes[i].updateMatrix();
-                        rotatingCubes[i].updateMatrixWorld();
+                        //rotatingCubes[i].updateMatrix();
+                        //rotatingCubes[i].updateMatrixWorld();
 
-                        //console.log(RCRotAxises[i]);
-                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
+                        //console.log("==========================================")
+                        //console.log(rotatingCubes[i].rotation);
+                        rotatingCubes[i].rotation.copy(RCBeginAngles2[i]);
+                        //rotatingCubes[i].rotation = RCBeginAngles2[i].clone();
+                        //rotatingCubes[i].quaternion = RCBeginAngles2[i].clone();
+                        //console.log(rotatingCubes[i].rotation);
+                        //rotatingCubes[i].updateMatrix();
+                        //rotatingCubes[i].updateMatrixWorld();
+                        //console.log(rotatingCubes[i].rotation);
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep);
+                        //console.log(rotatingCubes[i].rotation);
+                        //console.log("==========================================")
                     }
                     break;
                 case 1:
