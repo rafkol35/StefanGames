@@ -82,8 +82,9 @@
                     if (newTouchedCubic != newTouchedCubic2) {
                         newTouchedCubic = newTouchedCubic2;
                         if (newTouchedCubic != draggedCubic) {
-                            newTouchedCubicFaceNormal = intersects[0].face.normal;
+                            newTouchedCubicFaceNormal = intersects[0].face.normal.clone();
 
+                            //newTouchedCubic.quaternion.Eu
                             newTouchedCubicFaceNormal.applyQuaternion(newTouchedCubic.quaternion);
                             newTouchedCubicFaceNormal.round();
                             console.log(newTouchedCubicFaceNormal);
@@ -98,7 +99,7 @@
                                 setCubesEmissive(rotatingCubes, 0x888888);
                                 //blockOnRotate = true;
                                 mousePressed = false;
-                                console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
+
                                 rotateCubes(cubRotInfo);
                             }
                         }
@@ -128,7 +129,7 @@
 
                 if (intersects.length > 0) {
                     draggedCubic = intersects[0].object;
-                    draggedCubicFaceNormal = intersects[0].face.normal;
+                    draggedCubicFaceNormal = intersects[0].face.normal.clone();
                     newTouchedCubic = null;
                     //var _tbn = draggedCubicFaceNormal.clone();
                     //_tbn.applyQuaternion(draggedCubic.quaternion);
@@ -150,12 +151,12 @@
             //console.log(" " + mouseClickPos2.x + "  " + mouseClickPos2.y);// + " " + dist.length());
             var dist = mousePressedPos.distanceTo(mouseClickPos2);
             //console.log(dist);
-            //if (blockOnRotate) {    
-                if (dist < 0.01){
-                    setCubesEmissive(cubics, 0x000000);
-                    //rotatingCubes.cle
-                    blockOnRotate = false;
-                }
+            //if (blockOnRotate) {
+            if (dist < 0.01){
+                setCubesEmissive(cubics, 0x000000);
+                //rotatingCubes.cle
+                blockOnRotate = false;
+            }
             //}
         }
 
@@ -242,7 +243,7 @@
                     //if( )
                     //}
                     //else {
-                        pivot.add(cube);
+                    pivot.add(cube);
                     //}
                     cubics[i] = cube;
                     i++;
@@ -254,6 +255,10 @@
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var render = function () {
+            var dt = clock.getDelta()
+            if (RCBlock) {
+                rotateCubesStep(dt);
+            }
             if (blockOnRotate) {
 
                 //for (var i = 0 ; i < rotatingCubes.length ; ++i) {
@@ -366,10 +371,10 @@
             var cubRotInfo = new THREE.Vector3(0,0,0);
 
             rotatingCubes = [];
-          
+
             if (!draggedCubicFaceNormal.equals(newTouchedCubicFaceNormal)) {
-            //    console.warn("normalki sie nie zgadaja... - jeszcze poki co nie obsluguje tego przypadku");
-            //    return retCubs;
+                //    console.warn("normalki sie nie zgadaja... - jeszcze poki co nie obsluguje tego przypadku");
+                //    return retCubs;
             }
             var commonPosElement = -1;
             var commonPosElementVal = 0;
@@ -390,7 +395,7 @@
                     } else {
                         console.warn("getCubicsBy");
                     }
-                }                
+                }
             }
             else if (_cube1.position.y != _cube2.position.y) {
                 if (newTouchedCubicFaceNormal.x != 0) {
@@ -439,32 +444,59 @@
             return cubRotInfo;
         }
 
+        var RCBlock = false;
+        var RCDuration = 0;
+        var RCCubRotInfo = new THREE.Vector3();
+        var RCRotationCenterPos = new THREE.Vector3();
+        var RCBeginAngles = [];
+        var RCRs = [];
+
         function rotateCubes(cubRotInfo) {
+            console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
+
+            RCBlock = true;
+            RCDuration = 0;
+            RCCubRotInfo = cubRotInfo;
+            RCBeginAngles = [];
+            RCRs = [];
+
             var rotationCenterPos = new THREE.Vector3(0, 0, 0);
             switch (cubRotInfo.x) {
                 case 0:
                     rotationCenterPos = new THREE.Vector3(cubRotInfo.y, 0, 0);
+
                     for (var i = 0 ; i < rotatingCubes.length ; ++i) {
                         var _d = rotatingCubes[i].position.clone().sub(rotationCenterPos);
                         //if (_d.length() == 0) continue;
                         var beginAngle = Math.atan2(_d.y, _d.z);
+                        RCBeginAngles.push(beginAngle);
+                        RCRs.push(_d.length());
+                        continue;
+
                         //console.log(_d);
-                       // console.log((beginAngle * 180) / Math.PI);
+                        // console.log((beginAngle * 180) / Math.PI);
                         r = _d.length();
                         var th = -cubRotInfo.z * (Math.PI / 2) + beginAngle;
-                        //var th = (Math.PI / 2) + beginAngle;
-                        //var th = beginAngle;
                         var nz = Math.cos(th) * r + x0;
                         var ny = Math.sin(th) * r + y0;
 
-                        //console.log("++++++++++++++++++++++++++++++++++++");
-                        //console.log(rotatingCubes[i].position);
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
                         rotatingCubes[i].position.round();
-                        rotatingCubes[i].rotation.x += cubRotInfo.z * (Math.PI / 2);
-                        
-                        //console.log(rotatingCubes[i].position);
-                        //console.log("++++++++++++++++++++++++++++++++++++");
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+
+                        ////console.log("===================================");
+                        //var rotateAxis = new THREE.Vector3(1, 0, 0);
+                        //rotateAxis.applyQuaternion(pivot.quaternion);
+                        ////console.log(rotateAxis);
+                        ////rotateAxis.round();
+                        ////console.log(rotateAxis);
+                        ////rotateAroundWorldAxis(rotatingCubes[i], rotateAxis, -cubRotInfo.z * (Math.PI / 2));
+                        ////console.log(rotatingCubes[i].rotation.x);
+                        ////console.log(-cubRotInfo.x * (Math.PI / 2));
+                        //rotatingCubes[i].rotation.x += cubRotInfo.z * (Math.PI / 2);
+                        ////console.log(rotatingCubes[i].rotation.x);
+                        ////console.log("===================================");
                     }
                     break;
                 case 1:
@@ -473,6 +505,9 @@
                         var _d = rotatingCubes[i].position.clone().sub(rotationCenterPos);
                         //if (_d.length() == 0) continue;
                         var beginAngle = Math.atan2(_d.x, _d.z);
+                        RCBeginAngles.push(beginAngle);
+                        RCRs.push(_d.length());
+                        continue;
                         //console.log(_d);
                         //console.log((beginAngle * 180) / Math.PI);
                         r = _d.length();
@@ -480,36 +515,15 @@
                         var nz = Math.cos(th) * r + x0;
                         var nx = Math.sin(th) * r + y0;
 
-                        //console.log("++++++++++++++++++++++++++++++++++++");
-                        //console.log(rotatingCubes[i].position);
                         rotatingCubes[i].position.set(nx, rotatingCubes[i].position.y, nz);
                         rotatingCubes[i].position.round();
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
 
-                        var rotateAxis = new THREE.Vector3(0, 1, 0);
-
-                        //rotateAxis.applyQuaternion(rotatingCubes[i].quaternion);
+                        //var rotateAxis = new THREE.Vector3(0, 1, 0);
+                        //rotateAxis.applyQuaternion(pivot.quaternion);
                         //rotateAxis.round();
-
-                        rotateAxis.applyQuaternion(pivot.quaternion);
-                        rotateAxis.round();
-
-                        //rotatingCubes[i].worldToLocal(rotateAxis);
-                        //console.log(rotateAxis);
-                        //console.log(rotatingCubes[i].position);
-                        //rotateAxis = rotatingCubes[i].position.clone().sub(rotateAxis);
-                        //rotateAxis.round();
-                        //rotateAroundWorldAxis(rotatingCubes[i], rotateAxis, -cubRotInfo.z * (Math.PI / 2))
-                        
-                       // console.log(rotateAxis);
-                        
-                        //rotatingCubes[i].rotation.y += -cubRotInfo.z * (Math.PI / 2);
-                        //rotatingCubes[i].rotateOnAxis(rotateAxis, -cubRotInfo.z * (Math.PI / 2));
-
-                        
-                        //console.log(rotatingCubes[i].position);
-                        //console.log("++++++++++++++++++++++++++++++++++++");
+                        //rotateAroundWorldAxis(rotatingCubes[i], rotateAxis, -cubRotInfo.z * (Math.PI / 2));
                     }
                     break;
                 case 2:
@@ -518,6 +532,10 @@
                         var _d = rotatingCubes[i].position.clone().sub(rotationCenterPos);
                         //if (_d.length() == 0) continue;
                         var beginAngle = Math.atan2(_d.x, _d.y);
+                        RCBeginAngles.push(beginAngle);
+                        RCRs.push(_d.length());
+                        continue;
+
                         //console.log(_d);
                         // console.log((beginAngle * 180) / Math.PI);
                         r = _d.length();
@@ -527,17 +545,78 @@
                         var ny = Math.cos(th) * r + x0;
                         var nx = Math.sin(th) * r + y0;
 
-                        //console.log("++++++++++++++++++++++++++++++++++++");
-                        //console.log(rotatingCubes[i].position);
                         rotatingCubes[i].position.set(nx, ny, rotatingCubes[i].position.z);
-                        rotatingCubes[i].rotation.z += cubRotInfo.z * (Math.PI / 2);
                         rotatingCubes[i].position.round();
-                        //console.log(rotatingCubes[i].position);
-                        //console.log("++++++++++++++++++++++++++++++++++++");
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+
+                        //var rotateAxis = new THREE.Vector3(0, 0, 1);
+                        //rotateAxis.applyQuaternion(pivot.quaternion);
+                        //rotateAxis.round();
+                        //rotateAroundWorldAxis(rotatingCubes[i], rotateAxis, -cubRotInfo.y * (Math.PI / 2));
                     }
                     break;
+            }
+            RCRotationCenterPos = rotationCenterPos;
+            //rotateCubesStep(Math.PI / 2);
+        }
+
+        function rotateCubesStep(dt) {
+            RCDuration += dt;
+            RCDuration = Math.min(RCDuration, Math.PI / 2);
+            console.log(dt);
+            console.log(RCDuration);
+            switch (RCCubRotInfo.x) {
+                case 0:
+                    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+
+                        var th = -RCCubRotInfo.z * (RCDuration) + RCBeginAngles[i];
+                        var nz = Math.cos(th) * RCRs[i] + x0;
+                        var ny = Math.sin(th) * RCRs[i] + y0;
+
+                        rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
+                        //rotatingCubes[i].position.round();
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+                    }
+                    break;
+                case 1:
+                    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+                        
+                        var th = -RCCubRotInfo.z * (RCDuration) + RCBeginAngles[i];
+                        var nz = Math.cos(th) * r + x0;
+                        var nx = Math.sin(th) * r + y0;
+
+                        rotatingCubes[i].position.set(nx, rotatingCubes[i].position.y, nz);
+                        //rotatingCubes[i].position.round();
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+                    }
+                    break;
+                case 2:
+                    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+
+                        var th = -RCCubRotInfo.z * (RCDuration) + RCBeginAngles[i];
+                        var ny = Math.cos(th) * r + x0;
+                        var nx = Math.sin(th) * r + y0;
+
+                        rotatingCubes[i].position.set(nx, ny, rotatingCubes[i].position.z);
+                        //rotatingCubes[i].position.round();
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+                    }
                     break;
             }
+
+            if (RCDuration >= (Math.PI / 2)) {
+                for (var i = 0 ; i < rotatingCubes.length ; ++i) {
+                    rotatingCubes[i].position.round();
+                    rotatingCubes[i].updateMatrix();
+                    rotatingCubes[i].updateMatrixWorld();
+                }
+                RCBlock = false;
+            }
+
         }
 
     </script>
