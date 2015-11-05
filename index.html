@@ -113,6 +113,8 @@
 
         function onDocumentMouseDown(event) {
             event.preventDefault();
+            if (RCBlock) return;
+
             mousePressed = true;
             mouseClickPos.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouseClickPos.y = -(event.clientY / window.innerHeight) * 2 + 1;
