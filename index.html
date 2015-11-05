@@ -69,18 +69,6 @@
                 rotateAroundWorldAxis(pivot, new THREE.Vector3(1, 0, 0), diffanglex);
                 //pivot.updateMatrix();
                 //pivot.updateMatrixWorld();
-
-                //var i = 0;
-                //for (var x = -1 ; x <= 1 ; ++x) {
-                //    for (var y = -1 ; y <= 1 ; ++y) {
-                //        for (var z = -1 ; z <= 1 ; ++z) {
-                //            var cp = pivot.localToWorld(new THREE.Vector3(x, y, z));
-                //            //cubics[i].setRotationFromMatrix(pivot.matrixWorld);
-                //            //cubics[i].position.set(cp.x, cp.y, cp.z);
-                //            ++i;
-                //        }
-                //    }
-                //}
             }
             else if (mousePressed && draggedCubic) {
                 raycasterTouch.setFromCamera(mouse, camera);
@@ -98,33 +86,24 @@
 
                             newTouchedCubicFaceNormal.applyQuaternion(newTouchedCubic.quaternion);
                             newTouchedCubicFaceNormal.round();
+                            console.log(newTouchedCubicFaceNormal);
 
                             draggedCubicFaceNormal.applyQuaternion(draggedCubic.quaternion);
                             draggedCubicFaceNormal.round();
-                            //console.log(draggedCubicFaceNormal);
+                            console.log(draggedCubicFaceNormal);
 
-                            //var dcrp = getCubicRoundPosition(draggedCubic);
-                            //var crp = getCubicRoundPosition(newTouchedCubic);
-                            //console.log(dcrp);
-                            //console.log(crp);
-                            //console.log(newTouchedCubicFaceNormal);
-                            //console.log("szukam pozostałych 7-miu cubiców...");
-                            //rotatingCubes =
                             var cubRotInfo = getCubicsBy(draggedCubic, newTouchedCubic);
                             //console.log(rotatingCubes.length);
                             if (rotatingCubes.length == 9) {
                                 setCubesEmissive(rotatingCubes, 0x888888);
                                 //blockOnRotate = true;
                                 mousePressed = false;
-
                                 console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
-
                                 rotateCubes(cubRotInfo);
                             }
                         }
                     }
                 }
-                
             }
             mouseLast.set(mouse.x, mouse.y);
         }
@@ -150,48 +129,19 @@
                 if (intersects.length > 0) {
                     draggedCubic = intersects[0].object;
                     draggedCubicFaceNormal = intersects[0].face.normal;
-
-                    //console.log(draggedCubicFaceNormal);
-                    //console.log(draggedCubicFaceNormal.applyQuaternion(draggedCubic.quaternion));
-                    //console.log(draggedCubicFaceNormal.round());
-                    var _tbn = draggedCubicFaceNormal.clone();
-                    _tbn.applyQuaternion(draggedCubic.quaternion);
-                    _tbn.round();
-                    console.log(_tbn);
-
-                    //console.log(draggedCubic.position);
-                    //testRotatedCube = draggedCubic;
-
-                    //console.log(pivot.matrix);
-
-                    //x0 = testRotatedCube.position.x;
-                    //y0 = testRotatedCube.position.y;
-                    //r = new THREE.Vector2(testRotatedCube.position.x, testRotatedCube.position.y, 0).length();
-                    //var ccp = new THREE.Vector3(draggedCubic.position.x, draggedCubic.position.y, draggedCubic.position.z);
-                    //var cp = pivot.worldToLocal(ccp);
-                    //cp.round();
-                    ////console.log(cp);
-
-                    var crp = getCubicRoundPosition(draggedCubic);
-                    //console.log(crp);
-                    //console.log(draggedCubicFaceNormal);
-                    //console.log("========================");
+                    newTouchedCubic = null;
+                    //var _tbn = draggedCubicFaceNormal.clone();
+                    //_tbn.applyQuaternion(draggedCubic.quaternion);
+                    //_tbn.round();
+                    //console.log(_tbn);
                 }
-
-                //} else {
-                //    if (blockOnRotate) {
-                //        setCubesEmissive(rotatingCubes, 0x000000);
-                //        //rotatingCubes.cle
-                //        blockOnRotate = false;
-                //    }
-                //}
             }
         }
         function onDocumentMouseUp(event) {
             event.preventDefault();
             mousePressed = false;
             draggedCubic = null;
-
+            newTouchedCubic = null;
             var mouseClickPos2 = new THREE.Vector2(0,0);
             mouseClickPos2.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouseClickPos2.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -331,69 +281,7 @@
                 }
             }
 
-            //else {
-            //    if (blockOnRotate) {
-            //        console.log(rotatingCubes.length);
-            //        for (var i = 0 ; i < rotatingCubes.length ; ++i) {
-            //            rotatingCubes[i].material.emissive.setHex(0x888888);
-            //        }
-            //    }
-            //}
-
             requestAnimationFrame(render);
-
-            //testCube.rotation.x += 0.01;
-            //testCube.rotateOnAxis(tcAxis,0.01);
-
-            //if (blockOnRotate) {
-            //    //console.log(wa);
-            //    rotatePivot.rotateOnAxis(wa, 0.025);
-            //    //console.log(rotatingCubes);
-            //    for (var i = 0 ; i < rotatingCubes.length ; ++i) {
-            //        //var c = rotatingCubes[i];
-            //        //var lp = c.userData.clone();
-            //        //console.log(lp);
-            //        //rotatePivot.localToWorld(lp);
-            //        //console.log(lp);
-            //        //c.position.set(lp.x, lp.y, lp.z);
-            //        //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
-            //    }
-
-            //    //blockOnRotate = false;
-            //}
-
-            //if (testRotatedCube)
-            //{
-            //    var delta = clock.getDelta();
-            //    //console.log(delta);
-
-            //    var nx = Math.cos(th) * r + x0;
-            //    var ny = Math.sin(th) * r + y0;
-            //    testRotatedCube.position.x = nx;
-            //    testRotatedCube.position.y = ny;
-            //    ////testRotatedCube.rotation.set(testRotatedCube.rotation.x+=0.1,testRotatedCube.rotation.y,testRotatedCube.rotation.z);
-
-            //    for (var i = 0 ; i < cubics.length ; ++i) {
-            //        var c = cubics[i];
-            //        //var lp = c.userData.clone();
-            //        //console.log(lp);
-            //        //rotatePivot.localToWorld(lp);
-            //        //console.log(lp);
-            //        //c.position.set(lp.x, lp.y, lp.z);
-            //        //c.rotation.set( rotatePivot.rotation.x, rotatePivot.rotation.y, rotatePivot.rotation.z);
-            //    }
-
-
-            //    ////testRotatedCube.rotateOnAxis(wa,0.1);
-            //    //var nry = testRotatedCube.rotation.y;
-            //    var dNnr = delta * Math.PI * 2;
-            //    //nry += dNnr;
-            //    //testRotatedCube.rotation.set(testRotatedCube.rotation.x, nry, testRotatedCube.rotation.z);
-            //    ////testRotatedCube.translateX(0.1);
-            //    ////rotateAroundWorldAxis(testRotatedCube, wa, 0.1);
-
-            //    th += dNnr;
-            //}
 
             renderer.render(scene, camera);
             stats.update();
@@ -449,51 +337,6 @@
             object.rotation.setFromRotationMatrix(object.matrix);
         }
 
-        function getCubicRoundPosition(cubic) {
-            //var ccp = new THREE.Vector3(cubic.position.x, newTouchedCubic.position.y, newTouchedCubic.position.z);
-            var ccp = cubic.position.clone();
-            var cp = pivot.worldToLocal(ccp);
-            cp.round();
-            //console.log(cp);
-            return cp;
-        }
-
-        function getCube(locPos) {
-            for (var i = 0 ; i < cubics.length ; ++i) {
-                var cubic = cubics[i];
-                var crp = getCubicRoundPosition(cubic);
-
-                if (locPos.equals(crp)) {
-                    //console.log(crp);
-                    return cubic;
-                }
-            }
-            return null;
-        }
-
-        function getCubics(whichAxes, whichAxesIndex) {
-            var retCubs = [];
-            if (whichAxes.x == 1) {
-                var locPos = new THREE.Vector3(whichAxesIndex, 0, 0);
-                for (var y = -1 ; y <= 1 ; y++) {
-                    locPos.y = y;
-                    for (var z = -1 ; z <= 1 ; z++) {
-                        locPos.z = z;
-                        var c = getCube(locPos);
-                        //console.log(locPos);
-                        //console.log(c);
-                        if (c) {
-                            c.userData = locPos.clone();
-                            //console.log(c.userData);
-                            retCubs.push(c);
-                        }
-                    }
-                }
-            }
-            //console.log("--------------------------------------------------------");
-            return retCubs;
-        }
-
         function getCubics2(commonPosElement, commonPosElementVal) {
             //console.log("getCubics : " + commonPosElement + " => " + commonPosElementVal);
             //var retCubs = [];
@@ -522,18 +365,8 @@
         function getCubicsBy(_cube1, _cube2) {
             var cubRotInfo = new THREE.Vector3(0,0,0);
 
-            //var retCubs = [];
             rotatingCubes = [];
-            //console.log(draggedCubicFaceNormal);
-            //console.log(newTouchedCubicFaceNormal);
-
-            //var _dcfn = draggedCubicFaceNormal;
-            //var _ntcfn = newTouchedCubicFaceNormal;
-            //var _tmp1 = _cube1.localToWorld(draggedCubicFaceNormal);
-            //console.log(_tmp1);
-            //var _tmp2 = _cube1.worldToLocal(_tmp1);
-            //console.log(_tmp2);
-
+          
             if (!draggedCubicFaceNormal.equals(newTouchedCubicFaceNormal)) {
             //    console.warn("normalki sie nie zgadaja... - jeszcze poki co nie obsluguje tego przypadku");
             //    return retCubs;
@@ -600,12 +433,9 @@
 
             if (commonPosElement < 0) return;
 
-            //retCubs = 
             getCubics2(commonPosElement, commonPosElementVal);
-            //return retCubs;
             cubRotInfo.x = commonPosElement;
             cubRotInfo.y = commonPosElementVal;
-            //cubRotInfo.z = 0;
             return cubRotInfo;
         }
 
@@ -630,8 +460,9 @@
                         //console.log("++++++++++++++++++++++++++++++++++++");
                         //console.log(rotatingCubes[i].position);
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
-                        rotatingCubes[i].rotation.x += cubRotInfo.z * (Math.PI / 2);
                         rotatingCubes[i].position.round();
+                        rotatingCubes[i].rotation.x += cubRotInfo.z * (Math.PI / 2);
+                        
                         //console.log(rotatingCubes[i].position);
                         //console.log("++++++++++++++++++++++++++++++++++++");
                     }
@@ -640,7 +471,7 @@
                     rotationCenterPos = new THREE.Vector3(0, cubRotInfo.y, 0);
                     for (var i = 0 ; i < rotatingCubes.length ; ++i) {
                         var _d = rotatingCubes[i].position.clone().sub(rotationCenterPos);
-                        if (_d.length() == 0) continue;
+                        //if (_d.length() == 0) continue;
                         var beginAngle = Math.atan2(_d.x, _d.z);
                         //console.log(_d);
                         //console.log((beginAngle * 180) / Math.PI);
@@ -652,12 +483,34 @@
                         //console.log("++++++++++++++++++++++++++++++++++++");
                         //console.log(rotatingCubes[i].position);
                         rotatingCubes[i].position.set(nx, rotatingCubes[i].position.y, nz);
-                        rotatingCubes[i].rotation.y += -cubRotInfo.z * (Math.PI / 2);
                         rotatingCubes[i].position.round();
+                        rotatingCubes[i].updateMatrix();
+                        rotatingCubes[i].updateMatrixWorld();
+
+                        var rotateAxis = new THREE.Vector3(0, 1, 0);
+
+                        //rotateAxis.applyQuaternion(rotatingCubes[i].quaternion);
+                        //rotateAxis.round();
+
+                        rotateAxis.applyQuaternion(pivot.quaternion);
+                        rotateAxis.round();
+
+                        //rotatingCubes[i].worldToLocal(rotateAxis);
+                        //console.log(rotateAxis);
+                        //console.log(rotatingCubes[i].position);
+                        //rotateAxis = rotatingCubes[i].position.clone().sub(rotateAxis);
+                        //rotateAxis.round();
+                        //rotateAroundWorldAxis(rotatingCubes[i], rotateAxis, -cubRotInfo.z * (Math.PI / 2))
+                        
+                       // console.log(rotateAxis);
+                        
+                        //rotatingCubes[i].rotation.y += -cubRotInfo.z * (Math.PI / 2);
+                        //rotatingCubes[i].rotateOnAxis(rotateAxis, -cubRotInfo.z * (Math.PI / 2));
+
+                        
                         //console.log(rotatingCubes[i].position);
                         //console.log("++++++++++++++++++++++++++++++++++++");
                     }
-                    break;
                     break;
                 case 2:
                     rotationCenterPos = new THREE.Vector3(0, 0, cubRotInfo.y);
