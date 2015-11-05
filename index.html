@@ -87,11 +87,11 @@
                             //newTouchedCubic.quaternion.Eu
                             newTouchedCubicFaceNormal.applyQuaternion(newTouchedCubic.quaternion);
                             newTouchedCubicFaceNormal.round();
-                            console.log(newTouchedCubicFaceNormal);
+                            //console.log(newTouchedCubicFaceNormal);
 
                             draggedCubicFaceNormal.applyQuaternion(draggedCubic.quaternion);
                             draggedCubicFaceNormal.round();
-                            console.log(draggedCubicFaceNormal);
+                            //console.log(draggedCubicFaceNormal);
 
                             var cubRotInfo = getCubicsBy(draggedCubic, newTouchedCubic);
                             //console.log(rotatingCubes.length);
@@ -383,7 +383,7 @@
                     if (_cube1.position.y == _cube2.position.y) {
                         commonPosElement = 1;
                         commonPosElementVal = _cube1.position.y;
-                        cubRotInfo.z = _cube1.position.x - _cube2.position.x;
+                        cubRotInfo.z = (_cube2.position.x - _cube1.position.x) * newTouchedCubicFaceNormal.z;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -391,7 +391,7 @@
                     if (_cube1.position.z == _cube2.position.z) {
                         commonPosElement = 2;
                         commonPosElementVal = _cube1.position.z;
-                        cubRotInfo.z = _cube1.position.x - _cube2.position.x;
+                        cubRotInfo.z = (_cube1.position.x - _cube2.position.x) * newTouchedCubicFaceNormal.y;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -402,7 +402,7 @@
                     if (_cube1.position.z == _cube2.position.z) {
                         commonPosElement = 2;
                         commonPosElementVal = _cube1.position.z;
-                        cubRotInfo.z = _cube1.position.y - _cube2.position.y;
+                        cubRotInfo.z = (_cube2.position.y - _cube1.position.y) * newTouchedCubicFaceNormal.x;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -410,7 +410,7 @@
                     if (_cube1.position.x == _cube2.position.x) {
                         commonPosElement = 0;
                         commonPosElementVal = _cube1.position.x;
-                        cubRotInfo.z = _cube1.position.y - _cube2.position.y;
+                        cubRotInfo.z = (_cube1.position.y - _cube2.position.y) * newTouchedCubicFaceNormal.z;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -421,7 +421,7 @@
                     if (_cube1.position.x == _cube2.position.x) {
                         commonPosElement = 0;
                         commonPosElementVal = _cube1.position.x;
-                        cubRotInfo.z = _cube1.position.z - _cube2.position.z;
+                        cubRotInfo.z = (_cube2.position.z - _cube1.position.z) * newTouchedCubicFaceNormal.y;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -429,7 +429,7 @@
                     if (_cube1.position.y == _cube2.position.y) {
                         commonPosElement = 1;
                         commonPosElementVal = _cube1.position.y;
-                        cubRotInfo.z = _cube1.position.z - _cube2.position.z;
+                        cubRotInfo.z = (_cube1.position.z - _cube2.position.z) * newTouchedCubicFaceNormal.x;
                     } else {
                         console.warn("getCubicsBy");
                     }
@@ -456,7 +456,7 @@
         var RCRotAxises = [];
 
         function rotateCubes(cubRotInfo) {
-            console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
+            //console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
 
             RCBlock = true;
             RCDuration = 0;
@@ -483,7 +483,7 @@
                         //console.log(_t);
                         RCRotAxises.push(_t);
 
-                        RCBeginAngles2.push(rotatingCubes[i].rotation.x);
+                        //RCBeginAngles2.push(rotatingCubes[i].rotation.x);
 
                         continue;
                     }
@@ -539,33 +539,35 @@
             //RCDuration = Math.min(RCDuration, RCRotTime);
             
             RCStep = (RCDuration / RCRotTime) * (Math.PI / 2);
+            //RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime)) * (Math.PI / 2);
+            //dt *= EasingFunctions.easeInOutCubic(RCDuration / RCRotTime) / (RCDuration / RCRotTime);
             var RCStep2 = (dt / RCRotTime) * (Math.PI / 2);
 
-            //var _
-            //RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime) ) * (Math.PI / 2);
+            
+            //var RCStep2 = _RCStep2
+
             //console.log(dt);
             //console.log(RCDuration);
             switch (RCCubRotInfo.x) {
                 case 0:
                     for (var i = 0 ; i < rotatingCubes.length ; ++i) {
 
-                        var th = -RCCubRotInfo.z * RCStep + RCBeginAngles[i];
-                        var nz = Math.cos(th) * RCRs[i] + x0;
-                        var ny = Math.sin(th) * RCRs[i] + y0;
+                        var th = RCCubRotInfo.z * RCStep + RCBeginAngles[i];
+                        var ny = Math.cos(th) * RCRs[i] + x0;
+                        var nz = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
 
+                        //console.log(RCRotAxises[i]);
                         rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
-                        //rotatingCubes[i].rotation.toVector()
-                        //rotatingCubes[i].rotation.x += RCStep2;
                     }
                     break;
                 case 1:
                     for (var i = 0 ; i < rotatingCubes.length ; ++i) {
                         
-                        var th = -RCCubRotInfo.z * RCStep + RCBeginAngles[i];
+                        var th = RCCubRotInfo.z * RCStep + RCBeginAngles[i];
                         var nz = Math.cos(th) * RCRs[i] + x0;
                         var nx = Math.sin(th) * RCRs[i] + y0;
 
@@ -573,15 +575,15 @@
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
 
-                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], -RCCubRotInfo.z * RCStep2);
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
                     }
                     break;
                 case 2:
                     for (var i = 0 ; i < rotatingCubes.length ; ++i) {
 
-                        var th = -RCCubRotInfo.z * RCStep + RCBeginAngles[i];
-                        var ny = Math.cos(th) * RCRs[i] + x0;
-                        var nx = Math.sin(th) * RCRs[i] + y0;
+                        var th = RCCubRotInfo.z * RCStep + RCBeginAngles[i];
+                        var nx = Math.cos(th) * RCRs[i] + x0;
+                        var ny = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(nx, ny, rotatingCubes[i].position.z);
                         rotatingCubes[i].updateMatrix();
