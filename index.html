@@ -96,7 +96,7 @@
                             var cubRotInfo = getCubicsBy(draggedCubic, newTouchedCubic);
                             //console.log(rotatingCubes.length);
                             if (rotatingCubes.length == 9) {
-                                setCubesEmissive(rotatingCubes, 0x888888);
+                                //setCubesEmissive(rotatingCubes, 0x888888);
                                 //blockOnRotate = true;
                                 mousePressed = false;
 
@@ -153,7 +153,7 @@
             //console.log(dist);
             //if (blockOnRotate) {
             if (dist < 0.01){
-                setCubesEmissive(cubics, 0x000000);
+                //setCubesEmissive(cubics, 0x000000);
                 //rotatingCubes.cle
                 blockOnRotate = false;
             }
@@ -451,7 +451,9 @@
         var RCCubRotInfo = new THREE.Vector3();
         var RCRotationCenterPos = new THREE.Vector3();
         var RCBeginAngles = [];
+        var RCBeginAngles2 = [];
         var RCRs = [];
+        var RCRotAxises = [];
 
         function rotateCubes(cubRotInfo) {
             console.log(" " + cubRotInfo.x + " " + cubRotInfo.y + " " + cubRotInfo.z);
@@ -461,6 +463,7 @@
             RCCubRotInfo = cubRotInfo;
             RCBeginAngles = [];
             RCRs = [];
+            RCRotAxises = [];
 
             var rotationCenterPos = new THREE.Vector3(0, 0, 0);
             switch (cubRotInfo.x) {
@@ -473,6 +476,15 @@
                         var beginAngle = Math.atan2(_d.y, _d.z);
                         RCBeginAngles.push(beginAngle);
                         RCRs.push(_d.length());
+
+                        var _t = rotatingCubes[i].position.clone().add( new THREE.Vector3(1, 0, 0) );
+                        pivot.localToWorld(_t);
+                        rotatingCubes[i].worldToLocal(_t);
+                        //console.log(_t);
+                        RCRotAxises.push(_t);
+
+                        RCBeginAngles2.push(rotatingCubes[i].rotation.x);
+
                         continue;
                     }
                     break;
@@ -484,6 +496,13 @@
                         var beginAngle = Math.atan2(_d.x, _d.z);
                         RCBeginAngles.push(beginAngle);
                         RCRs.push(_d.length());
+
+                        var _t = rotatingCubes[i].position.clone().add(new THREE.Vector3(0, 1, 0));
+                        pivot.localToWorld(_t);
+                        rotatingCubes[i].worldToLocal(_t);
+                        //console.log(_t);
+                        RCRotAxises.push(_t);
+
                         continue;
                     }
                     break;
@@ -495,6 +514,13 @@
                         var beginAngle = Math.atan2(_d.x, _d.y);
                         RCBeginAngles.push(beginAngle);
                         RCRs.push(_d.length());
+
+                        var _t = rotatingCubes[i].position.clone().add(new THREE.Vector3(0, 0, 1));
+                        pivot.localToWorld(_t);
+                        rotatingCubes[i].worldToLocal(_t);
+                        //console.log(_t);
+                        RCRotAxises.push(_t);
+
                         continue;
                     }
                     break;
@@ -506,9 +532,17 @@
 
         function rotateCubesStep(dt) {
             RCDuration += dt;
-            RCDuration = Math.min(RCDuration, RCRotTime);
-            //RCStep = (RCDuration / RCRotTime) * (Math.PI / 2);
-            RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime) ) * (Math.PI / 2);
+            if (RCDuration > RCRotTime) {
+                dt -= (RCDuration - RCRotTime);
+                RCDuration = RCRotTime;
+            }
+            //RCDuration = Math.min(RCDuration, RCRotTime);
+            
+            RCStep = (RCDuration / RCRotTime) * (Math.PI / 2);
+            var RCStep2 = (dt / RCRotTime) * (Math.PI / 2);
+
+            //var _
+            //RCStep = EasingFunctions.easeInOutCubic((RCDuration / RCRotTime) ) * (Math.PI / 2);
             //console.log(dt);
             //console.log(RCDuration);
             switch (RCCubRotInfo.x) {
@@ -520,9 +554,12 @@
                         var ny = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(rotatingCubes[i].position.x, ny, nz);
-                        //rotatingCubes[i].position.round();
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
+
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
+                        //rotatingCubes[i].rotation.toVector()
+                        //rotatingCubes[i].rotation.x += RCStep2;
                     }
                     break;
                 case 1:
@@ -533,9 +570,10 @@
                         var nx = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(nx, rotatingCubes[i].position.y, nz);
-                        //rotatingCubes[i].position.round();
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
+
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], -RCCubRotInfo.z * RCStep2);
                     }
                     break;
                 case 2:
@@ -546,9 +584,10 @@
                         var nx = Math.sin(th) * RCRs[i] + y0;
 
                         rotatingCubes[i].position.set(nx, ny, rotatingCubes[i].position.z);
-                        //rotatingCubes[i].position.round();
                         rotatingCubes[i].updateMatrix();
                         rotatingCubes[i].updateMatrixWorld();
+
+                        rotatingCubes[i].rotateOnAxis(RCRotAxises[i], RCCubRotInfo.z * RCStep2);
                     }
                     break;
             }
@@ -556,9 +595,9 @@
             if (RCDuration >= RCRotTime) {
                 //console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
                 for (var i = 0 ; i < rotatingCubes.length ; ++i) {
-                    console.log(rotatingCubes[i].position);
+                    //console.log(rotatingCubes[i].position);
                     rotatingCubes[i].position.round();
-                    console.log(rotatingCubes[i].position);
+                    //console.log(rotatingCubes[i].position);
                     rotatingCubes[i].updateMatrix();
                     rotatingCubes[i].updateMatrixWorld();
                 }
